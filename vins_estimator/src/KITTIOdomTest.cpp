@@ -41,8 +41,8 @@ int main(int argc, char** argv)
 	{
 		printf("please intput: rosrun vins kitti_odom_test [config file] [data folder] \n"
 			   "for example: rosrun vins kitti_odom_test "
-			   "~/catkin_ws/src/VINS-Fusion/config/kitti_odom/kitti_config00-02.yaml "
-			   "/media/tony-ws1/disk_D/kitti/odometry/sequences/00/ \n");
+			   "/path/to/catkin_ws/src/VINS-Fusion/config/kitti_odom/kitti_config00-02.yaml "
+			   "/path/to/kitti/odometry/sequences/00/ \n");
 		return 1;
 	}
 
@@ -52,7 +52,7 @@ int main(int argc, char** argv)
 	printf("read sequence: %s\n", argv[2]);
 	string dataPath = sequence + "/";
 
-	readParameters(config_file);
+	readParameters(config_file, "/tmp/vins_output.txt");
 	estimator.setParameter();
 	registerPub(n);
 
