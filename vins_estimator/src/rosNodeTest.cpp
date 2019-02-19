@@ -70,6 +70,8 @@ cv::Mat getImageFromMsg(const sensor_msgs::ImageConstPtr &img_msg)
 // extract images with same timestamp from two topics
 void sync_process()
 {
+	bool start = false;
+	double elap_time = 0;
     while(1)
     {
         if(STEREO)
@@ -105,7 +107,11 @@ void sync_process()
             }
             m_buf.unlock();
             if(!image0.empty())
+            {
                 estimator.inputImage(time, image0, image1);
+                start = true;
+                elap_time = 0;
+            }
         }
         else
         {
@@ -122,11 +128,21 @@ void sync_process()
             }
             m_buf.unlock();
             if(!image.empty())
+            {
                 estimator.inputImage(time, image);
+                start = true;
+                elap_time = 0;
+            }
         }
 
         std::chrono::milliseconds dura(2);
         std::this_thread::sleep_for(dura);
+        elap_time += 0.002;
+        if(start && elap_time > 5.)
+        {
+        	printf("rosbag seems to finish, exit here\n");
+        	exit(0);
+        }
     }
 }
 
