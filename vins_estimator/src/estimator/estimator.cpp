@@ -9,6 +9,7 @@
 
 #include "estimator.h"
 #include "../utility/visualization.h"
+#include "tumfilelogger.h"
 
 Estimator::Estimator(): f_manager{Rs}
 {
@@ -59,7 +60,8 @@ void Estimator::inputImage(double t, const cv::Mat &_img, const cv::Mat &_img1)
     //printf("featureTracker time: %f\n", featureTrackerTime.toc());
     
     if(MULTIPLE_THREAD)  
-    {     
+    {
+        // LookAtHere: only process half frames
         if(inputImageCnt % 2 == 0)
         {
             mBuf.lock();
@@ -150,6 +152,7 @@ void Estimator::processMeasurements()
 {
     while (1)
     {
+        TicToc tic;
         //printf("process measurments\n");
         pair<double, map<int, vector<pair<int, Eigen::Matrix<double, 7, 1> > > > > feature;
         vector<pair<double, Eigen::Vector3d>> accVector, gyrVector;
@@ -203,12 +206,21 @@ void Estimator::processMeasurements()
             header.frame_id = "world";
             header.stamp = ros::Time(feature.first);
 
-            pubOdometry(*this, header);
-            pubKeyPoses(*this, header);
-            pubCameraPose(*this, header);
-            pubPointCloud(*this, header);
-            pubKeyframe(*this);
-            pubTF(*this, header);
+            // LookAtHere: Stop publishing for high framerate
+            // pubOdometry(*this, header);
+            // pubKeyPoses(*this, header);
+            // pubCameraPose(*this, header);
+            // pubPointCloud(*this, header);
+            // pubKeyframe(*this);
+            // pubTF(*this, header);
+
+            // LookAtHere
+            Quaterniond quat = Quaterniond(this->Rs[WINDOW_SIZE]);
+            Vector3d posi = this->Ps[WINDOW_SIZE];
+            std::vector<double> framepose = {header.stamp.toSec(), posi.x(), posi.y(), posi.z(),
+                                             quat.w(), quat.x(), quat.y(), quat.z()};
+            TumFileLogger::instance().push_pose(framepose);
+            TumFileLogger::instance().push_time(tic.toc());
         }
 
         if (! MULTIPLE_THREAD)

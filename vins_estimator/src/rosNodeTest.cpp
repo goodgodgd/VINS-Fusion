@@ -20,6 +20,7 @@
 #include "estimator/estimator.h"
 #include "estimator/parameters.h"
 #include "utility/visualization.h"
+#include "estimator/tumfilelogger.h"
 
 Estimator estimator;
 
@@ -231,6 +232,8 @@ int main(int argc, char **argv)
     string output_file = argv[2];
     printf("output_file: %s\n", argv[2]);
 
+    TumFileLogger::instance().init(argv[2]);
+
     readParameters(config_file, output_file);
     estimator.setParameter();
 
@@ -249,6 +252,7 @@ int main(int argc, char **argv)
 
     std::thread sync_thread{sync_process};
     ros::spin();
+    TumFileLogger::instance().dump();
 
     return 0;
 }
