@@ -19,43 +19,32 @@ public:
     void init(string filename_)
     {
         filename = filename_;
-        pose_log.clear();
-        time_log.clear();
+        frame_log.clear();
     }
 
-    void push_pose(vector<double> pose)
+    void push(vector<double> frameres)
     {
-        pose_log.push_back(pose);
-    }
-
-    void push_time(double time)
-    {
-        time_log.push_back(time);
+        frame_log.push_back(frameres);
     }
 
     void dump()
     {
         cout << "dump pose results on " << filename << endl;
-        cout << "len(poses) = " << pose_log.size() << ", len(times) = " << time_log.size() << endl;
+        cout << "num frames = " << frame_log.size() << endl;
         ofstream fout(filename, ios::trunc);
         fout.setf(ios::fixed, ios::floatfield);
         fout.precision(6);
-        for(size_t i=0; i<pose_log.size(); i++)
+        for(auto frameres: frame_log)
         {
-            for(double val: pose_log[i])
+            for(double val: frameres)
                 fout << val << " ";
-            if(i < time_log.size())
-                fout << time_log[i] << " ";
-            else
-                fout << 0. << " ";
             fout << endl;
         }
     }
 
 private:
     TumFileLogger() {}
-    vector<vector<double>> pose_log;
-    vector<double> time_log;
+    vector<vector<double>> frame_log;
     string filename;
 };
 

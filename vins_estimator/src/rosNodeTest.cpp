@@ -138,11 +138,12 @@ void sync_process()
 
         std::chrono::milliseconds dura(2);
         std::this_thread::sleep_for(dura);
+        // LookAtHere: terminate when rosbag finished
         elap_time += 0.002;
-        if(start && elap_time > 5.)
+        if(start && elap_time > 2.)
         {
         	printf("rosbag seems to finish, exit here\n");
-        	exit(0);
+        	ros::shutdown();
         }
     }
 }
