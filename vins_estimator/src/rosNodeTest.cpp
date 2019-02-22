@@ -61,10 +61,24 @@ cv::Mat getImageFromMsg(const sensor_msgs::ImageConstPtr &img_msg)
         img.encoding = "mono8";
         ptr = cv_bridge::toCvCopy(img, sensor_msgs::image_encodings::MONO8);
     }
+    else if (img_msg->encoding == "16UC1")
+    {
+        sensor_msgs::Image img;
+        img.header = img_msg->header;
+        img.height = img_msg->height;
+        img.width = img_msg->width;
+        img.is_bigendian = img_msg->is_bigendian;
+        img.step = img_msg->step;
+        img.data = img_msg->data;
+        img.encoding = "mono16";
+        ptr = cv_bridge::toCvCopy(img, sensor_msgs::image_encodings::MONO16);
+    }
     else
         ptr = cv_bridge::toCvCopy(img_msg, sensor_msgs::image_encodings::MONO8);
 
     cv::Mat img = ptr->image.clone();
+    if(img.type() == CV_16UC1)
+        img.convertTo(img, CV_8UC1, 1./180.);
     return img;
 }
 
@@ -142,7 +156,8 @@ void sync_process()
         elap_time += 0.002;
         if(start && elap_time > 2.)
         {
-        	printf("rosbag seems to finish, exit here\n");
+        	printf("rosbag seems to finish, dump and exit here\n");
+            TumFileLogger::instance().dump();
         	ros::shutdown();
         }
     }
@@ -253,7 +268,6 @@ int main(int argc, char **argv)
 
     std::thread sync_thread{sync_process};
     ros::spin();
-    TumFileLogger::instance().dump();
 
     return 0;
 }

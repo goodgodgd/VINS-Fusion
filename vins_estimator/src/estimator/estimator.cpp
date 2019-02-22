@@ -206,7 +206,7 @@ void Estimator::processMeasurements()
             header.frame_id = "world";
             header.stamp = ros::Time(feature.first);
 
-            // LookAtHere: Stop publishing for high framerate
+            // LookAtHere: Stop publishing for high frame rate
             // pubOdometry(*this, header);
             // pubKeyPoses(*this, header);
             // pubCameraPose(*this, header);
