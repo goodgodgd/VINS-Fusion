@@ -218,7 +218,7 @@ void Estimator::processMeasurements()
             Quaterniond quat = Quaterniond(this->Rs[WINDOW_SIZE]);
             Vector3d posi = this->Ps[WINDOW_SIZE];
             std::vector<double> frameres = {header.stamp.toSec(), posi.x(), posi.y(), posi.z(),
-                                             quat.w(), quat.x(), quat.y(), quat.z(), tic.toc()};
+                                            quat.x(), quat.y(), quat.z(), quat.w(), tic.toc()};
             TumFileLogger::instance().push(frameres);
         }
 
